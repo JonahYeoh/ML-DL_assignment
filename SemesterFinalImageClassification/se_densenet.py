@@ -181,6 +181,6 @@ class j_se_densenet(tf.keras.Model):
         sq_9 = tf.keras.activations.sigmoid(sq_9)
         exci_9 = multiply([block3_layer3, sq_9])
 
-        x = GlobalAveragePooling2D()(block3)
+        x = GlobalAveragePooling2D()(exci_9)
         x = Flatten()(x)
         return self.classifier(x)

@@ -119,6 +119,6 @@ class densenet3x3(tf.keras.Model):
         block3_layer3 = self.block3_conv6(block3_layer3)
         block3_layer3 = ReLU()(self.block3_batchnorm6(block3_layer3))
 
-        x = GlobalAveragePooling2D()(block3)
+        x = GlobalAveragePooling2D()(block3_layer3)
         x = Flatten()(x)
         return self.classifier(x)

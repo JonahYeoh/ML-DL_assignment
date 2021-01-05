@@ -124,6 +124,7 @@ class densenet3x3(tf.keras.Model):
         return self.classifier(x)
 
 
+
 class densenet_4(tf.keras.Model):
     def __init__(self, k = 32, label_size=10, output_activation='softmax'):
         super(densenet4, self).__init__()
@@ -240,18 +241,19 @@ class densenet_4(tf.keras.Model):
         block4_layer1 = self.block4_conv2(block4_layer1)
         block4_layer1 = ReLU()(self.block4_batchnorm2(block4_layer1))
 
-        block4_layer2 = Concatenate()([block2, block4_layer1])
+        block4_layer2 = Concatenate()([block3, block4_layer1])
         block4_layer2 = self.block4_conv3(block4_layer2)
         block4_layer2 = ReLU()(self.block4_batchnorm3(block4_layer2))
         block4_layer2 = self.block4_conv4(block4_layer2)
         block4_layer2 = ReLU()(self.block4_batchnorm4(block4_layer2))
 
-        block4_layer3 = Concatenate()([block2, block4_layer1, block4_layer2])
+        block4_layer3 = Concatenate()([block3, block4_layer1, block4_layer2])
         block4_layer3 = self.block4_conv5(block4_layer3)
         block4_layer3 = ReLU()(self.block4_batchnorm5(block4_layer3))
         block4_layer3 = self.block4_conv6(block4_layer3)
         block4_layer3 = ReLU()(self.block4_batchnorm6(block4_layer3))
         #
+        block4_layer3 = Concatenate()([block3, block4_layer1, block4_layer2, block4_layer3])
         x = GlobalAveragePooling2D()(block4_layer3)
         x = Flatten()(x)
         return self.classifier(x)

@@ -1,11 +1,16 @@
-# se_densenet3x3
+"""
+    name: se_densenet30
+    layers: 30 + 5 pooling
+    blocks: 4
+    distribution: [6, 6, 6, 8]
+"""
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Concatenate, Dense, Dropout, Flatten, Conv2D, multiply, AveragePooling2D, GlobalAveragePooling2D, MaxPooling2D, BatchNormalization, ReLU
 
-class j_se_densenet(tf.keras.Model):
+class se_densenet30(tf.keras.Model):
     def __init__(self, k = 32, r=8, label_size=10, output_activation='softmax'):
-        super(j_se_densenet, self).__init__()
+        super(se_densenet30, self).__init__()
         d = k // r
         self.input_conv = Conv2D(k, kernel_size=(7,7), strides=1, padding='same')
         self.input_batchnorm = BatchNormalization()
@@ -28,7 +33,7 @@ class j_se_densenet(tf.keras.Model):
         self.block1_batchnorm6 = BatchNormalization()
         self.block1_dense5 = Dense(d)
         self.block1_dense6 = Dense(d*r)
-        self.tl_1 = Conv2D(k, kernel_size=(1,1), strides=(1,1), padding='same')
+        self.block1_tl = Conv2D(k, kernel_size=(1,1), strides=1, padding='same')
         # block 2
         self.block2_conv1 = Conv2D(k, kernel_size=(1,1), strides=1, padding='same')
         self.block2_batchnorm1 = BatchNormalization()
@@ -48,7 +53,7 @@ class j_se_densenet(tf.keras.Model):
         self.block2_batchnorm6 = BatchNormalization()
         self.block2_dense5 = Dense(d)
         self.block2_dense6 = Dense(d*r)
-        self.tl_2 = Conv2D(k, kernel_size=(1,1), strides=(1,1), padding='same')
+        self.block2_tl = Conv2D(k, kernel_size=(1,1), strides=1, padding='same')
         # block 3
         self.block3_conv1 = Conv2D(k, kernel_size=(1,1), strides=1, padding='same')
         self.block3_batchnorm1 = BatchNormalization()
@@ -68,6 +73,32 @@ class j_se_densenet(tf.keras.Model):
         self.block3_batchnorm6 = BatchNormalization()
         self.block3_dense5 = Dense(d)
         self.block3_dense6 = Dense(d*r)
+        self.block3_tl = Conv2D(k, kernel_size=(1,1), strides=1, padding='same')
+        # block 4
+        self.block4_conv1 = Conv2D(k, kernel_size=(1,1), strides=1, padding='same')
+        self.block4_batchnorm1 = BatchNormalization()
+        self.block4_conv2 = Conv2D(k, kernel_size=(3,3), strides=1, padding='same')
+        self.block4_batchnorm2 = BatchNormalization()
+        self.block4_dense1 = Dense(d)
+        self.block4_dense2 = Dense(d*r)
+        self.block4_conv3 = Conv2D(k, kernel_size=(1,1), strides=1, padding='same')
+        self.block4_batchnorm3 = BatchNormalization()
+        self.block4_conv4 = Conv2D(k, kernel_size=(3,3), strides=1, padding='same')
+        self.block4_batchnorm4 = BatchNormalization()
+        self.block4_dense3 = Dense(d)
+        self.block4_dense4 = Dense(d*r)
+        self.block4_conv5 = Conv2D(k, kernel_size=(1,1), strides=1, padding='same')
+        self.block4_batchnorm5 = BatchNormalization()
+        self.block4_conv6 = Conv2D(k, kernel_size=(3,3), strides=1, padding='same')
+        self.block4_batchnorm6 = BatchNormalization()
+        self.block4_dense5 = Dense(d)
+        self.block4_dense6 = Dense(d*r)
+        self.block4_conv7 = Conv2D(k, kernel_size=(1,1), strides=1, padding='same')
+        self.block4_batchnorm7 = BatchNormalization()
+        self.block4_conv8 = Conv2D(k, kernel_size=(3,3), strides=1, padding='same')
+        self.block4_batchnorm8 = BatchNormalization()
+        self.block4_dense7 = Dense(d)
+        self.block4_dense8 = Dense(d*r)
         self.classifier = Dense(label_size, activation=output_activation)
 
     def call(self, inputs):
@@ -108,9 +139,9 @@ class j_se_densenet(tf.keras.Model):
         exci_3 = multiply([block1_layer3, sq_3])
 
         block1_layer3 = Concatenate()([x, exci_1, exci_2, exci_3])
-        block1_layer3 = self.tl_1(block1_layer3)
+        block1_layer3 = self.block1_tl(block1_layer3)
         block1 = ReLU()(block1_layer3)
-        block1 = AveragePooling2D(pool_size=(2,2), strides=2, padding='same')(block1)
+        block1 = AveragePooling2D(pool_size=(3,3), strides=2, padding='same')(block1)
         # block 2
         block2_layer1 = self.block2_conv1(block1)
         block2_layer1 = ReLU()(self.block2_batchnorm1(block2_layer1))
@@ -145,9 +176,9 @@ class j_se_densenet(tf.keras.Model):
         exci_6 = multiply([block2_layer3, sq_6])
 
         block2_layer3 = Concatenate()([block1, exci_4, exci_5, exci_6])
-        block2_layer3 = self.tl_2(block2_layer3)
+        block2_layer3 = self.block2_tl(block2_layer3)
         block2 = ReLU()(block2_layer3)
-        block2 = AveragePooling2D(pool_size=(2,2), strides=2, padding='same')(block2)
+        block2 = AveragePooling2D(pool_size=(3,3), strides=2, padding='same')(block2)
         # block 3
         block3_layer1 = self.block3_conv1(block2)
         block3_layer1 = ReLU()(self.block3_batchnorm1(block3_layer1))
@@ -181,6 +212,55 @@ class j_se_densenet(tf.keras.Model):
         sq_9 = tf.keras.activations.sigmoid(sq_9)
         exci_9 = multiply([block3_layer3, sq_9])
 
-        x = GlobalAveragePooling2D()(exci_9)
+        block3_layer3 = Concatenate()([block2, exci_7, exci_8, exci_9])
+        block3_layer3 = self.block3_tl(block3_layer3)
+        block3 = ReLU()(block3_layer3)
+        block3 = AveragePooling2D(pool_size=(3,3), strides=2, padding='same')(block3)
+        # block 4
+        block4_layer1 = self.block4_conv1(block3)
+        block4_layer1 = ReLU()(self.block4_batchnorm1(block4_layer1))
+        block4_layer1 = self.block4_conv2(block4_layer1)
+        block4_layer1 = ReLU()(self.block4_batchnorm2(block4_layer1))
+        sq_10 = GlobalAveragePooling2D()(block4_layer1)
+        sq_10 = ReLU()(self.block4_dense1(sq_10))
+        sq_10 = ReLU()(self.block4_dense2(sq_10))
+        sq_10 = tf.keras.activations.sigmoid(sq_10)
+        exci_10 = multiply([block4_layer1, sq_10])
+
+        block4_layer2 = Concatenate()([block3, exci_10])
+        block4_layer2 = self.block4_conv3(block4_layer2)
+        block4_layer2 = ReLU()(self.block4_batchnorm3(block4_layer2))
+        block4_layer2 = self.block4_conv4(block4_layer2)
+        block4_layer2 = ReLU()(self.block4_batchnorm4(block4_layer2))
+        sq_11 = GlobalAveragePooling2D()(block4_layer2)
+        sq_11 = ReLU()(self.block4_dense3(sq_11))
+        sq_11 = ReLU()(self.block4_dense4(sq_11))
+        sq_11 = tf.keras.activations.sigmoid(sq_11)
+        exci_11 = multiply([block4_layer2, sq_11])
+
+        block4_layer3 = Concatenate()([block3, exci_10, exci_11])
+        block4_layer3 = self.block4_conv5(block4_layer3)
+        block4_layer3 = ReLU()(self.block4_batchnorm5(block4_layer3))
+        block4_layer3 = self.block4_conv6(block4_layer3)
+        block4_layer3 = ReLU()(self.block4_batchnorm6(block4_layer3))
+        sq_12 = GlobalAveragePooling2D()(block4_layer3)
+        sq_12 = ReLU()(self.block4_dense5(sq_12))
+        sq_12 = ReLU()(self.block4_dense6(sq_12))
+        sq_12 = tf.keras.activations.sigmoid(sq_12)
+        exci_12 = multiply([block4_layer3, sq_12])
+
+        block4_layer4 = Concatenate()([block3, exci_10, exci_11, exci_12])
+        block4_layer4 = self.block4_conv7(block4_layer3)
+        block4_layer4 = ReLU()(self.block4_batchnorm7(block4_layer3))
+        block4_layer4 = self.block4_conv8(block4_layer3)
+        block4_layer4 = ReLU()(self.block4_batchnorm8(block4_layer3))
+        sq_13 = GlobalAveragePooling2D()(block4_layer4)
+        sq_13 = ReLU()(self.block4_dense7(sq_13))
+        sq_13 = ReLU()(self.block4_dense8(sq_13))
+        sq_13 = tf.keras.activations.sigmoid(sq_13)
+        exci_13 = multiply([block4_layer4, sq_13])
+
+        block4 = Concatenate()([block3, exci_10, exci_11, exci_12, exci_13])
+        x = GlobalAveragePooling2D()(block4)
         x = Flatten()(x)
         return self.classifier(x)

@@ -58,10 +58,11 @@ class resnet28(tf.keras.Model):
         self.block3_batchnorm_5 = BatchNormalization()
         self.block3_conv5 = Conv2D(4*k, kernel_size=(3,3), strides=1, padding='same')
         self.block3_batchnorm_6 = BatchNormalization()
-        self.block3_conv6 = Conv2D(2*k, kernel_size=(1,1), strides=1, padding='same')
+        self.block3_conv6 = Conv2D(4*k, kernel_size=(1,1), strides=1, padding='same')
         self.block3_batchnorm_7 = BatchNormalization()
-        self.block3_conv7 = Conv2D(2*k, kernel_size=(3,3), strides=1, padding='same')
+        self.block3_conv7 = Conv2D(4*k, kernel_size=(3,3), strides=1, padding='same')
         self.block3_batchnorm_8 = BatchNormalization()
+        self.transition_3 = Conv2D(4*k, kernel_size=(3,3), strides=2, padding='same')
         # block 4
         self.block4_conv0 = Conv2D(4*k, kernel_size=(1,1), strides=2, padding='same')
         self.block4_batchnorm_1 = BatchNormalization()
@@ -183,7 +184,7 @@ class resnet28(tf.keras.Model):
         block4_layer1 = ReLU()(block4_layer1)
         block4_layer1 = self.block4_conv1(block4_layer1)
         block4_layer1 = self.block4_batchnorm_2(block4_layer1)
-        x = self.transition_2(block3_layer4)
+        x = self.transition_3(block3_layer4)
         block4_layer1 = add([x, block4_layer1])
         block4_layer1 = ReLU()(block4_layer1)
         ## layer 2

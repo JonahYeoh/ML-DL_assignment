@@ -1,6 +1,6 @@
 """
-    name: resnet28
-    layers: 28
+    name: resnet29
+    layers: 29 + 2 pooling
     blocks: 4
     distribution: [6, 8, 8, 6]
 """
@@ -8,9 +8,9 @@ import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import add, Concatenate, Dense, Dropout, Flatten, Conv2D, AveragePooling2D, GlobalAveragePooling2D, MaxPooling2D, BatchNormalization, ReLU
 
-class resnet28(tf.keras.Model):
+class resnet29(tf.keras.Model):
     def __init__(self, k = 64, label_size=10, output_activation='softmax'):
-        super(resnet28, self).__init__()
+        super(resnet29, self).__init__()
         self.input_conv = Conv2D(k, kernel_size=(7,7), strides=1, padding='same')
         self.input_batchnorm = BatchNormalization()
         # block 1

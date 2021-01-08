@@ -116,7 +116,7 @@ class csp_resnet29(tf.keras.Model):
         block1_layer3 = add([block1_layer2, block1_layer3])
         block1_layer3 = ReLU()(block1_layer3)
         part_a = self.up_1(part_a)
-        block1 = add([part_a, block1_layer3])
+        block1 = Concatenate()([part_a, block1_layer3])
         # block 2
         part_c = block1[:, :, :, :self.split_ratio]
         part_d = block1[:, :, :, self.split_ratio:]
@@ -154,7 +154,7 @@ class csp_resnet29(tf.keras.Model):
         block2_layer4 = add([block2_layer3, block2_layer4])
         block2_layer4 = ReLU()(block2_layer4)
         part_c = self.up_2(part_c)
-        block2 = add([part_c, block2_layer4])
+        block2 = Concatenate()([part_c, block2_layer4])
         # block 3
         part_e = block2[:, :, :, :self.split_ratio]
         part_f = block2[:, :, :, self.split_ratio:]
@@ -192,7 +192,7 @@ class csp_resnet29(tf.keras.Model):
         block3_layer4 = add([block3_layer3, block3_layer4])
         block3_layer4 = ReLU()(block3_layer4)
         part_e = self.up_3(part_e)
-        block3 = add([part_e, block3_layer4])
+        block3 = Concatenate()([part_e, block3_layer4])
         # block 4
         part_g = block3[:, :, :, :self.split_ratio]
         part_h = block3[:, :, :, self.split_ratio:]
@@ -222,8 +222,8 @@ class csp_resnet29(tf.keras.Model):
         block4_layer3 = add([block4_layer2, block4_layer3])
         block4_layer3 = ReLU()(block4_layer3)
         part_g = self.up_4(part_g)
-        block4 = add([part_g, block4_layer3])
-
+        block4 = Concatenate()([part_g, block4_layer3])
+        
         x = GlobalAveragePooling2D()(block4)
         x = Flatten()(x)
         return self.classifier(x)

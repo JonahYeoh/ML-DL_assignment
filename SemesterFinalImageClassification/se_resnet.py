@@ -86,6 +86,7 @@ class se_resnet29(tf.keras.Model):
         self.block3_batchnorm_8 = BatchNormalization()
         self.block3_dense7 = Dense(d*4)
         self.block3_dense8 = Dense(d*4*r)
+        self.transition_3 = Conv2D(4*k, kernel_size=(3,3), strides=1, padding='same')
         # block 4
         self.block4_conv0 = Conv2D(4*k, kernel_size=(1,1), strides=1, padding='same')
         self.block4_batchnorm_1 = BatchNormalization()
@@ -270,7 +271,7 @@ class se_resnet29(tf.keras.Model):
         block4_layer1 = self.block4_conv1(block4_layer1)
         block4_layer1 = self.block4_batchnorm_2(block4_layer1)
         ## transition
-        block3_layer4 = self.transition_2(block3_layer4)
+        block3_layer4 = self.transition_3(block3_layer4)
         sq_11 = GlobalAveragePooling2D()(block4_layer1)
         sq_11 = self.block4_dense1(sq_11)
         sq_11 = ReLU()(sq_11)

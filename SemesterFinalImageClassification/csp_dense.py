@@ -11,7 +11,7 @@ from tensorflow.keras.layers import Concatenate, Dense, Dropout, Flatten, Conv2D
 class csp_densenet30(tf.keras.Model):
     def __init__(self, k = 32, label_size=10, ratio=0.5, output_activation='softmax'):
         super(csp_densenet30, self).__init__()
-        self.split_ratio = k * 0.5
+        self.split_ratio = int(k * 0.5) # has to be integer
         self.input_conv = Conv2D(k, kernel_size=(7,7), strides=1, padding='same')
         self.input_batchnorm = BatchNormalization()
         # block 1
@@ -102,7 +102,7 @@ class csp_densenet30(tf.keras.Model):
         block1_layer3 = ReLU()(self.block1_batchnorm6(block1_layer3))
 
         block1_layer3 = Concatenate()([part_a, block1_layer3])
-        block1_layer3 = self.tl_1(block1_layer3)
+        block1_layer3 = self.block1_tl(block1_layer3)
         block1 = ReLU()(block1_layer3)
         block1 = AveragePooling2D(pool_size=(2,2), strides=2, padding='same')(block1)
         # block 2

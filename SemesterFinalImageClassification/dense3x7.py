@@ -125,7 +125,7 @@ class densenet3x3(tf.keras.Model):
 
 
 """
-    name: densenet
+    name: densenet30
     layers: 30 + 5 pooling
     blocks: 4
     distribution: [6, 6, 6, 8]

@@ -4,17 +4,18 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras import Model
 from tensorflow.keras.layers import AveragePooling2D, MaxPooling2D
-from tensorflow.keras.layers import add, Input, Concatenate, Dense, GlobalAveragePooling2D, GlobalMaxPooling2D, ReLU, multiply
+from tensorflow.keras.layers import add, Input, Concatenate, Dense, GlobalAveragePooling2D, GlobalMaxPooling2D, ReLU, multiply, BatchNormalization
 
 from my_nn_modules.fcl.dense import _fully_connected_layer
 from my_nn_modules.conv.fundamental import _conv2d
 
 def _se_block(in_tensor, filters, d=8):
-    squeeze = GlobalAveragePooling2D()(in_tensor)
+    bn = BatchNormalization()(in_tensor)
+    squeeze = GlobalAveragePooling2D()(bn)
     fully_connected = ReLU()(Dense(d)(squeeze))
     fully_connected = ReLU()(Dense(filters)(fully_connected))
     sig_activated = tf.keras.activations.sigmoid(fully_connected)
-    return multiply([in_tensor, sig_activated]) # excited
+    return multiply([bn, sig_activated]) # excited
 
 # can be simplified breaking into with and without bottle_neck
 def _se_res_block(in_tensor, filters, d=8, downsample=True, bottle_neck=True):

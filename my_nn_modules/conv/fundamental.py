@@ -34,8 +34,8 @@ def _channel_attention(in_tensor, reduction=8):
     return Activation('sigmoid')(summation)
 
 def _spatial_attention(in_tensor, kernels):
-    p_avg = AveragePooling2D(pool_size=(3,3), strides=(2,2), padding='same')(in_tensor)
-    p_max = MaxPooling2D(pool_size=(3,3), strides=(2,2), padding='same')(in_tensor)
+    p_avg = AveragePooling2D(pool_size=(3,3), strides=(1,1), padding='same')(in_tensor)
+    p_max = MaxPooling2D(pool_size=(3,3), strides=(1,1), padding='same')(in_tensor)
     stack = Concatenate()([p_avg, p_max])
     conv = Conv2D(1, kernel_size=(7,7), strides=(1,1), padding='same')(stack)
     return Activation('sigmoid')(conv)

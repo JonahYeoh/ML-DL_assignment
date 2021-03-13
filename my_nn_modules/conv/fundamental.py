@@ -33,14 +33,14 @@ def _channel_attention(in_tensor, reduction=8):
     summation = Add()([dense_avg, dense_max])
     return Activation('sigmoid')(summation)
 
-def _spatial_attention(in_tensor, kernels):
+def _spatial_attention(in_tensor):
     p_avg = AveragePooling2D(pool_size=(3,3), strides=(1,1), padding='same')(in_tensor)
     p_max = MaxPooling2D(pool_size=(3,3), strides=(1,1), padding='same')(in_tensor)
     stack = Concatenate()([p_avg, p_max])
     conv = Conv2D(1, kernel_size=(7,7), strides=(1,1), padding='same')(stack)
     return Activation('sigmoid')(conv)
 
-def _spatial_attention_module(in_tensor, kernels):
-    f1 = Multiply()([_channel_attention(in_tensor), in_tensor])
+def _spatial_attention_module(in_tensor, reduction=8):
+    f1 = Multiply()([_channel_attention(in_tensor, reduction), in_tensor])
     f2 = Multiply()([_spatial_attention(f1), f1])
     return Add()([in_tensor, f2])
